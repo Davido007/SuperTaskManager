@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import com.example.menedzerzadan.R;
 /**
  * Klasa bedaca pierwsza aktywnoscia.
  * Glownym zadaniem klasy jest pobranie daty, wyslanie jej do nastepnej aktywnosci oraz przejscie do nastepnej aktywnosci
@@ -30,7 +31,7 @@ public class MenedzerZadan extends Activity {
 	  	final Button exitButton=(Button) this.findViewById(R.id.button1);
 		nextButton.setOnClickListener(new Button.OnClickListener(){
 			/*
-			 * Metoda obsluguj¹ca klikniêcie na przycisk "dalej".
+			 * Metoda obslugujï¿½ca klikniï¿½cie na przycisk "dalej".
 			 * Jej zadania to: 
 			 * - pobranie ustawionej na kalendarzu daty
 			 * - wpisanie jej w odpowiedniej postaci do stringa
@@ -46,7 +47,7 @@ public class MenedzerZadan extends Activity {
  	              startActivity(intent);             		   
          	  }});
 			/* 
-			 * Metoda obsluguj¹ca klikniêcie na przycisk "wyjdz"
+			 * Metoda obslugujï¿½ca klikniï¿½cie na przycisk "wyjdz"
 			 * Jej zadaniem jest wyjscie z aplikacji
 			 * 
 			 */

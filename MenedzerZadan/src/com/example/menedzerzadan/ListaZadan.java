@@ -11,11 +11,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
-
+import com.example.menedzerzadan.R;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,13 +31,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 /**
  * Klasa bedaca druga aktywnoscia
  * Jest odpowiedzialna za:
- * - przegladanie zadañ
- * - tworzenie nowych zadañ
- * - edytowanie zadañ
+ * - przegladanie zadaï¿½
+ * - tworzenie nowych zadaï¿½
+ * - edytowanie zadaï¿½
  * @author Dawid Plichta
  *
  */
@@ -52,7 +58,7 @@ public class ListaZadan extends Activity {
 	String opisZadania="";
 	String name="";
 	/**
-	 * Metoda odpowiedzialna za wyswietlenie listy zadañ oraz przycisku (dodaj zadanie)
+	 * Metoda odpowiedzialna za wyswietlenie listy zadaï¿½ oraz przycisku (dodaj zadanie)
 	 */
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +69,7 @@ public class ListaZadan extends Activity {
 	final TimePicker czasKonca = (TimePicker) view.findViewById(R.id.TimePicker01);  //zegra czasu konca
 	final Button addButton = (Button) findViewById(R.id.button1);    // button dodawania
 	final EditText editText = (EditText) view.findViewById(R.id.editText1);  //miejsce na opis zadania
+	final Button locationButton = (Button) view.findViewById(R.id.locationButton);
 	final ListView listview = (ListView) findViewById(R.id.listView1);   //lista na ekranie glownym
     final AlertDialog.Builder oknoZadania = new AlertDialog.Builder(this);  // okno zadania
     final AlertDialog.Builder oknoBledu=new AlertDialog.Builder(this);   //okno bledu
@@ -116,7 +123,7 @@ public class ListaZadan extends Activity {
     /*
      * Metoda ustawiajaca parametry przycisku "ok"
      * Glownym zadaniem jest ustawienie obslugi klikania na przycisk:
-     * - Jesli czas startu zadania jest wiekszy od czasu koñca zadania lub opis zadania jest pusty wyswietla okno bledu
+     * - Jesli czas startu zadania jest wiekszy od czasu koï¿½ca zadania lub opis zadania jest pusty wyswietla okno bledu
      * - w kazdym innym przypadku zapisuje ustawione parametry do zmiennej typu string, przetwarza go i dopisuje do listy w odpowiednim miejscu
      * - aktualizuje liste na glownym ekranie oraz w pliku
      * 
@@ -163,6 +170,14 @@ public class ListaZadan extends Activity {
     		  oknoZadania.show(); 
     		  
     	  }});
+    
+    locationButton.setOnClickListener(new Button.OnClickListener() {
+    	
+  	  @Override
+  	  public void onClick(View arg0) {
+  		  if(isConn()) startActivity(new Intent(ListaZadan.this, MapActivity.class));
+  		  else Toast.makeText(ListaZadan.this, "Potrzebne polaczenie z internetem", Toast.LENGTH_LONG).show();
+  	  }});
     /*
      * Metoda ustawiajaca obsluge klikania na poszczegolne elementy listy
      * - przetwarza stringa z zadaniem
@@ -197,6 +212,16 @@ public class ListaZadan extends Activity {
       }
     });
   }
+  
+	public boolean isConn() { //sprawdzenie czy jest poÅ‚Ä…czenie z internetem
+        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity.getActiveNetworkInfo() != null) {
+            if (connectivity.getActiveNetworkInfo().isConnected())
+                return true;
+        }
+        return false;
+    }
+	
   /**
    * Metoda odpowiedzialna za sprawdzenie czy istnieje plik o podanej jako parametr nazwie
    * 

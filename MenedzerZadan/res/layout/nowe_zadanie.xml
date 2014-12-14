@@ -70,4 +70,12 @@
         <requestFocus />
     </EditText>
 
+    <Button
+        android:id="@+id/locationButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editText1"
+        android:layout_centerHorizontal="true"
+        android:text="Okresl pozycje" />
+
 </RelativeLayout>

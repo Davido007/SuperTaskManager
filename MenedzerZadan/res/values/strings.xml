@@ -6,5 +6,6 @@
     <string name="hello_world">Hello world!</string>
     <color name="Black">#000000</color>
     <color name="white">#FFFFFF</color>
+    <string name="service_name">GPSService</string>
 
 </resources>

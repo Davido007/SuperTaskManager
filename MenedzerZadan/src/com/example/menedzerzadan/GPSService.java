@@ -2,6 +2,7 @@ package com.example.menedzerzadan;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import com.example.menedzerzadan.R;
 import com.google.android.gms.maps.model.LatLng;
@@ -194,6 +195,12 @@ public class GPSService extends Service {
         }
         return false;
     }
+	
+	private double calculateDistance(Location newLocation, Location taskLocation) { //obliczanie dystansu (tylko dla przebytej trasy)
+		double distance = 0;
+		distance = newLocation.distanceTo(taskLocation);
+		return distance;
+	}
 
 	public class LocalBinder extends Binder {
 		GPSService getService() {

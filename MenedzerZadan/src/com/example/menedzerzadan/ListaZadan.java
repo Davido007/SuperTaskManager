@@ -57,6 +57,7 @@ public class ListaZadan extends Activity {
 	String minutaKonca;
 	String opisZadania="";
 	String name="";
+	double latitude, longitude;
 	/**
 	 * Metoda odpowiedzialna za wyswietlenie listy zada� oraz przycisku (dodaj zadanie)
 	 */
@@ -67,9 +68,10 @@ public class ListaZadan extends Activity {
 	final View view = LayoutInflater.from(ListaZadan.this).inflate(R.layout.nowe_zadanie, null);  //layout okna Zadania
 	final TimePicker czasStartu = (TimePicker) view.findViewById(R.id.timePicker1);  //zegar czasu startu
 	final TimePicker czasKonca = (TimePicker) view.findViewById(R.id.TimePicker01);  //zegra czasu konca
-	final Button addButton = (Button) findViewById(R.id.button1);    // button dodawania
-	final EditText editText = (EditText) view.findViewById(R.id.editText1);  //miejsce na opis zadania
+	final Button addButton = (Button) findViewById(R.id.addTaskButton);    // button dodawania
+	final EditText editText = (EditText) view.findViewById(R.id.taskNameEditText);  //miejsce na opis zadania
 	final Button locationButton = (Button) view.findViewById(R.id.locationButton);
+	final EditText radiusEditText = (EditText) view.findViewById(R.id.radiusEditText);
 	final ListView listview = (ListView) findViewById(R.id.listView1);   //lista na ekranie glownym
     final AlertDialog.Builder oknoZadania = new AlertDialog.Builder(this);  // okno zadania
     final AlertDialog.Builder oknoBledu=new AlertDialog.Builder(this);   //okno bledu
@@ -175,7 +177,8 @@ public class ListaZadan extends Activity {
     	
   	  @Override
   	  public void onClick(View arg0) {
-  		  if(isConn()) startActivity(new Intent(ListaZadan.this, MapActivity.class));
+  		  if(isConn()) startActivityForResult(new Intent(ListaZadan.this, MapActivity.class)
+  		  											.putExtra("radius", Double.parseDouble(radiusEditText.getText().toString())), 0);
   		  else Toast.makeText(ListaZadan.this, "Potrzebne polaczenie z internetem", Toast.LENGTH_LONG).show();
   	  }});
     /*
@@ -376,6 +379,15 @@ System.out.println("tutaj");
     }
 
   }
+  
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(resultCode==RESULT_OK) {
+			data.getDoubleExtra("latitude", 0.0);
+			data.getDoubleExtra("longitude", 0.0);
+		}
+	}
 
 
 } 

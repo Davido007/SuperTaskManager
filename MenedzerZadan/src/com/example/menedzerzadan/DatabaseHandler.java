@@ -18,6 +18,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_LONGITUDE = "LONGITUDE";
 	private static final String KEY_DESCRIPTION = "DESCRIPTION";
 	private static final String KEY_ACTION = "ACTION"; //akcja do wykonania przy danym zadaniu
+	private static final String KEY_RADIUS = "RADIUS";
 
 	public DatabaseHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -33,7 +34,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_TASKS_TABLE = "CREATE TABLE " + TASKS_TABLE_NAME + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_PRZEDZIALCZASU
 				+ " TEXT, " + KEY_LATITUDE + " REAL, " + KEY_LONGITUDE
-				+ " REAL, " + KEY_ACTION + " TEXT)";
+				+ " REAL, " + KEY_ACTION + " TEXT, " + KEY_RADIUS + " REAL)";
 		db.execSQL(CREATE_TASKS_TABLE);
 		
 	}
@@ -44,7 +45,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	
-	public void addPoint(String przedzialCzasu, double latitude, double longitude, String action, String description) {
+	public void addTask(String przedzialCzasu, double latitude, double longitude, String action, String description, double radius) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues values = new ContentValues();
@@ -53,6 +54,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_LONGITUDE, longitude);
 		values.put(KEY_DESCRIPTION, description);
 		values.put(KEY_ACTION, action);
+		values.put(KEY_RADIUS, radius);
 		db.insert(TASKS_TABLE_NAME, null, values);
 	}
 	

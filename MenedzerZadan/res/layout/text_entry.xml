@@ -40,7 +40,7 @@
         android:layout_alignParentBottom="true" >
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/editDayTaskButton"
             android:layout_width="match_parent"
             android:layout_height="70sp"
             android:layout_weight="1"
@@ -48,7 +48,7 @@
             android:text="Dalej" />
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/addDayTaskButton"
             android:layout_width="match_parent"
             android:layout_height="70sp"
             android:layout_weight="1"

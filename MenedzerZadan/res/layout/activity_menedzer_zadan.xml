@@ -21,7 +21,7 @@
         android:textSize="26sp" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/addDayTaskButton"
         android:layout_width="200dp"
         android:layout_height="80dp"
         android:layout_below="@+id/textView1"
@@ -31,11 +31,11 @@
         android:text="Dodaj dzien zadan" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/editDayTaskButton"
         android:layout_width="200dp"
         android:layout_height="80dp"
-        android:layout_alignRight="@+id/button1"
-        android:layout_below="@+id/button1"
+        android:layout_alignRight="@+id/addDayTaskButton"
+        android:layout_below="@+id/addDayTaskButton"
         android:layout_marginTop="34dp"
         android:background="@drawable/but1"
         android:text="Edytuj dzien zadan" />

@@ -3,33 +3,43 @@ package com.example.menedzerzadan;
 import com.example.menedzerzadan.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.Button;
-import android.widget.Toast;
 
-public class MapActivity extends FragmentActivity implements OnMarkerClickListener{
+public class MapActivity extends FragmentActivity implements OnMarkerClickListener, OnMapClickListener {
 
     private GoogleMap mMap;
 	private DatabaseHandler db;
-
+	private Intent data = new Intent();
+	private double radius;
+	private int markerCount = 0;
+	private Circle circle;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         
+        radius = getIntent().getDoubleExtra("radius", 0.0);
         db = new DatabaseHandler(this);
         setUpMapIfNeeded();
-       
     }
 
 
@@ -40,13 +50,18 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
     }
 	
     
-    
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();
+    	setResult(RESULT_OK, data);
+    }
     
     
     private void setUpMapIfNeeded() {
         if (mMap == null) {
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             mMap.setOnMarkerClickListener(this);
+            mMap.setOnMapClickListener(this);
             if (mMap != null) {
                  setUpMap(); //przygotowanie map, ustawienie położenia na mapie na przebytą trasę
             }
@@ -81,7 +96,9 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
     @Override
     public boolean onMarkerClick(final Marker marker) {
     	
-    	//dialog z opcją usunięcia markera?
+    	marker.remove();
+    	circle.remove();
+    	markerCount--;
     	return false;
     }
     
@@ -89,4 +106,25 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
 		public void onBackPressed() {
 			super.onBackPressed();
 		}
+
+
+		@Override
+		public void onMapClick(LatLng arg0) {
+			if (markerCount==0) {
+				// TODO Auto-generated method stub
+				mMap.addMarker(new MarkerOptions()
+						.position(arg0)
+						.icon(BitmapDescriptorFactory
+								.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+				circle = mMap.addCircle(new CircleOptions().center(arg0)
+						.radius(radius).strokeColor(Color.RED)
+						.fillColor(Color.BLUE));
+				markerCount++;
+				data.putExtra("latitude", arg0.latitude);
+				data.putExtra("longitude", arg0.longitude);
+			}
+			
+
+		}
+		
 }

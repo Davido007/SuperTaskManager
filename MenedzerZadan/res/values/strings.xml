@@ -7,5 +7,7 @@
     <color name="Black">#000000</color>
     <color name="white">#FFFFFF</color>
     <string name="service_name">GPSService</string>
+    <string name="enable_gps">Moduł GPS</string>
+    <string name="enable_gps_dialog">Aplikacja wymaga aktywnego modułu GPS do działania. Włączyć?</string>
 
 </resources>

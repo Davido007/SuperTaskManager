@@ -30,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -46,7 +47,7 @@ import android.widget.Toast;
 public class ListaZadan extends Activity {
 	
 	File nowyPlik;
-	final ArrayList<String> list = new ArrayList<String>();
+	ArrayList<String> list = new ArrayList<String>();
 	boolean isFile=true;
 	boolean czyWczesniej=false;
 	StableArrayAdapter adapter;
@@ -57,7 +58,11 @@ public class ListaZadan extends Activity {
 	String minutaKonca;
 	String opisZadania="";
 	String name="";
+	String date = "";
 	double latitude, longitude;
+	private DatabaseHandler db;
+	private ArrayAdapter<CharSequence> spinnerAdapter;
+	private String chosenAction;
 	/**
 	 * Metoda odpowiedzialna za wyswietlenie listy zada� oraz przycisku (dodaj zadanie)
 	 */
@@ -65,6 +70,7 @@ public class ListaZadan extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.zadania_dnia);
+    db = new DatabaseHandler(this);
 	final View view = LayoutInflater.from(ListaZadan.this).inflate(R.layout.nowe_zadanie, null);  //layout okna Zadania
 	final TimePicker czasStartu = (TimePicker) view.findViewById(R.id.timePicker1);  //zegar czasu startu
 	final TimePicker czasKonca = (TimePicker) view.findViewById(R.id.TimePicker01);  //zegra czasu konca
@@ -72,12 +78,19 @@ public class ListaZadan extends Activity {
 	final EditText editText = (EditText) view.findViewById(R.id.taskNameEditText);  //miejsce na opis zadania
 	final Button locationButton = (Button) view.findViewById(R.id.locationButton);
 	final EditText radiusEditText = (EditText) view.findViewById(R.id.radiusEditText);
+	final Spinner chooseActionSpinner = (Spinner) view.findViewById(R.id.chooseActionSpinner);
+	
+	spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.actionSpinner, android.R.layout.simple_spinner_dropdown_item);
+	spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	chooseActionSpinner.setAdapter(spinnerAdapter);
+	
 	final ListView listview = (ListView) findViewById(R.id.listView1);   //lista na ekranie glownym
     final AlertDialog.Builder oknoZadania = new AlertDialog.Builder(this);  // okno zadania
     final AlertDialog.Builder oknoBledu=new AlertDialog.Builder(this);   //okno bledu
 	Bundle bundle = getIntent().getExtras();
 	final Context context= this.getApplicationContext();
 	name=bundle.getString("name")+".txt";	
+	date = bundle.getString("date");
 	CzyJestPlik(name);
 	/*
 	 * Jesli plik o podanej nazwie nie istnieje tworzymy nowy plik, jesli istnieje wczytujemy liste z pliku
@@ -87,7 +100,8 @@ public class ListaZadan extends Activity {
 		StworzNowyPlik(name);
 	}
 	else {
-		WczytajListeZPliku(name);
+		//WczytajListeZPliku(name);
+		WczytajListeZBazyDanych();
 	}
 	adapter = new StableArrayAdapter(context,android.R.layout.simple_list_item_1, list);
 	czasStartu.setIs24HourView(true);   //ustawienie zegarow na 24-godzinne
@@ -100,6 +114,7 @@ public class ListaZadan extends Activity {
 	 */
     final DialogInterface.OnClickListener Clickacz=new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int which) {
+        	//db.deleteSinglePositionFromSavedTasks(godzinaStartu+":"+minutaStartu, godzinaKonca+":"+minutaKonca, date, date, opisZadania);
         	ZapisDoPliku(list,name);
         	adapter.notifyDataSetChanged();
         	((ViewGroup)view.getParent()).removeView(view);
@@ -145,12 +160,24 @@ public class ListaZadan extends Activity {
 	    		 opisZadania="";
 	    		if((czasStartu.getCurrentHour()<Integer.valueOf(godzinaStartu))||((czasStartu.getCurrentHour()==Integer.valueOf(godzinaStartu))&&(czasStartu.getCurrentMinute()<Integer.valueOf(minutaStartu)))){
 	    			czyWczesniej=true;
+	    			
+	    			if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wycisz telefon")) chosenAction = Action.MUTEPHONE;
+	    	    	else if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wyślij smsa")) chosenAction = Action.SENDSMS;
+	    			
+	    			db.addTask(date, date, godzinaStartu+":"+minutaStartu, godzinaKonca+":"+minutaKonca, latitude, longitude, chosenAction, opisZadania, Double.parseDouble(radiusEditText.getText().toString()));
 	    			list.add(i,zadanie);
 	    			break;
 	    		}
 	    	} 
 	    	if(czyWczesniej==false)
 	    	list.add(zadanie);
+	    	
+	    	if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wycisz telefon")) chosenAction = Action.MUTEPHONE;
+	    	else if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wyślij smsa")) chosenAction = Action.SENDSMS;
+	    	
+	    	db.addTask(date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
+	    			czasKonca.getCurrentHour().toString()+":"+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
+	    			chosenAction, editText.getText().toString(), Double.parseDouble(radiusEditText.getText().toString()));
 	    	adapter = new StableArrayAdapter(context,android.R.layout.simple_list_item_1, list);
 	    	ZapisDoPliku(list,name);
 	    	listview.setAdapter(adapter);
@@ -265,6 +292,7 @@ public class ListaZadan extends Activity {
    * @param nazwa
    */
   public void WczytajListeZPliku(String nazwa){
+	  
 		File istniejacyPlik = (new File(getFilesDir()+File.separator+nazwa));
 		Scanner in = null;
 		try {
@@ -279,6 +307,10 @@ System.out.println("tutaj");
 		iteratorListy++;
 		}
 	}
+  
+  public void WczytajListeZBazyDanych() {
+	  list = db.getTasksForDay(date);
+  }
   /**
    * Metoda odpowiedzialna za wyluskanie parametrow zadania ze stringa:
    * - godzina startu

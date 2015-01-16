@@ -47,29 +47,6 @@
         android:scaleX="0.8"
         android:scaleY="0.8" />
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/timePicker1"
-        android:layout_centerHorizontal="true"
-        android:text="Zadanie:"
-        android:textColor="@color/white"
-        android:textSize="20dp" />
-
-    <EditText
-        android:id="@+id/taskNameEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="14dp"
-        android:background="@color/white"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
-
     <EditText
         android:id="@+id/radiusEditText"
         android:layout_width="wrap_content"
@@ -77,6 +54,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/locationButton"
+        android:text="100"
         android:ems="10"
         android:inputType="numberDecimal" />
 
@@ -87,5 +65,41 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:text="Okresl pozycje" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/timePicker1"
+        android:text="Zadanie:"
+        android:textColor="@color/white"
+        android:textSize="20dp" />
+
+    <EditText
+        android:id="@+id/taskNameEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/locationButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/timePicker1"
+        android:background="@color/white"
+        android:ems="10" />
+
+    <TextView
+        android:id="@+id/chooseActionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView1"
+        android:layout_alignParentRight="true"
+        android:text="Wybierz akcję" />
+
+    <Spinner
+        android:id="@+id/chooseActionSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/locationButton"
+        android:layout_alignLeft="@+id/chooseActionTextView"
+        android:layout_below="@+id/chooseActionTextView" />
 
 </RelativeLayout>

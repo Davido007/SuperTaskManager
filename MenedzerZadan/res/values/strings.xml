@@ -9,5 +9,9 @@
     <string name="service_name">GPSService</string>
     <string name="enable_gps">Moduł GPS</string>
     <string name="enable_gps_dialog">Aplikacja wymaga aktywnego modułu GPS do działania. Włączyć?</string>
+    <string-array name="actionSpinner">
+        <item >Wycisz telefon</item>
+        <item >Wyślij smsa</item>
+    </string-array>
 
 </resources>

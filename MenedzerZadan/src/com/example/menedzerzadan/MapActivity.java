@@ -1,6 +1,7 @@
 package com.example.menedzerzadan;
 
 import com.example.menedzerzadan.R;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
@@ -53,7 +54,7 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
     @Override
     protected void onDestroy() {
     	super.onDestroy();
-    	setResult(RESULT_OK, data);
+    	
     }
     
     
@@ -86,7 +87,8 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
                       } else {
                         mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                       }
-                      mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 100));
+                      mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 50));
+                      mMap.animateCamera(CameraUpdateFactory.zoomOut());
                 }
             });
         }
@@ -99,6 +101,9 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
     	marker.remove();
     	circle.remove();
     	markerCount--;
+    	data.removeExtra("latitude");
+    	data.removeExtra("longitude");
+    	setResult(RESULT_CANCELED);
     	return false;
     }
     
@@ -117,11 +122,12 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
 						.icon(BitmapDescriptorFactory
 								.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 				circle = mMap.addCircle(new CircleOptions().center(arg0)
-						.radius(radius).strokeColor(Color.RED)
-						.fillColor(Color.BLUE));
+						.radius(radius)
+						.fillColor(Color.argb(120, 0, 0, 255)));
 				markerCount++;
 				data.putExtra("latitude", arg0.latitude);
 				data.putExtra("longitude", arg0.longitude);
+				setResult(RESULT_OK, data);
 			}
 			
 

@@ -2,6 +2,9 @@ package com.example.menedzerzadan;
 
 
 
+import java.text.DateFormat;
+import java.util.Calendar;
+
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -26,6 +29,8 @@ public class MenedzerZadan extends Activity {
 	private LocationManager locationManager;
 	private boolean gpsEnabled;
 	private ConnectivityManager connectivity;
+	private final DateFormat timestampFormat = DateFormat.getDateTimeInstance();
+
 
 	@Override 
 	/**
@@ -57,7 +62,11 @@ public class MenedzerZadan extends Activity {
 			 */ 
          	  @Override 
          	  public void onClick(View arg0) {
+         		 Calendar cal = Calendar.getInstance();
+         		 cal.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
+         		String currentDate = timestampFormat.format(cal.getTime());
          		  String value = String.valueOf(datePicker.getMonth())+"-"+String.valueOf(datePicker.getDayOfMonth());
+         		  b.putString("date", timestampFormat.format(cal.getTime()).substring(0, timestampFormat.format(cal.getTime()).length()-9));
  		          b.putString("name", value);
  		          intent.putExtras(b);
  	              startActivity(intent);             		   

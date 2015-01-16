@@ -3,6 +3,7 @@ package com.example.menedzerzadan;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import com.example.menedzerzadan.R;
 import com.google.android.gms.maps.model.LatLng;
@@ -47,6 +48,11 @@ public class GPSService extends Service {
 	private SensorManager sensorMgr;
 	private DatabaseHandler db;
 	public static LatLng startingLocation;
+	private ArrayList<Location> locList;
+	private double[][] markerLocations;
+	private double[] radiusList;
+	private final DateFormat timestampFormat = DateFormat.getDateTimeInstance();
+	private String currentDate;
 	
 	private void startLoggerService() { //jeśli internet jest włączony, oba provider-y będą działać
 		
@@ -148,7 +154,21 @@ public class GPSService extends Service {
 	
 	@Override
 	public void onCreate() {
+		locList = new ArrayList<Location>();
 		db = new DatabaseHandler(this);
+		Calendar cal = Calendar.getInstance();
+		currentDate = timestampFormat.format(cal.getTime());
+		markerLocations = db.getTasksCoordinatesForDay(currentDate);
+		radiusList = db.getTasksRadiiForDay(currentDate);
+		
+		if (markerLocations!=null) {
+			for (int j = 0; j < markerLocations.length; j++) {
+				Location loc = new Location("imaginaryprovider");
+				loc.setLongitude(markerLocations[j][0]);
+				loc.setLatitude(markerLocations[j][1]);
+				locList.add(loc);
+			}
+		}
 		prefs = getSharedPreferences("preferences", 0);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		super.onCreate();
@@ -200,6 +220,19 @@ public class GPSService extends Service {
 		double distance = 0;
 		distance = newLocation.distanceTo(taskLocation);
 		return distance;
+	}
+	
+	private boolean isLocationInMarkersRange(ArrayList<Location> locationList, Location newLocation) {
+		boolean isInRange = false;
+		for(int i = 0; i<locList.size(); i++) {
+			double distance = calculateDistance(newLocation, locList.get(i));
+			if(distance<=radiusList[i]) {
+				isInRange = true;
+				break;
+			}
+		}
+		
+		return isInRange;
 	}
 
 	public class LocalBinder extends Binder {

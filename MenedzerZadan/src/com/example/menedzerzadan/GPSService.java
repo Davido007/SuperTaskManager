@@ -50,9 +50,10 @@ public class GPSService extends Service {
 	public static LatLng startingLocation;
 	private ArrayList<Location> locList;
 	private double[][] markerLocations;
-	private double[] radiusList;
+	private ArrayList<Double> radiusList;
 	private final DateFormat timestampFormat = DateFormat.getDateTimeInstance();
 	private String currentDate;
+	private ArrayList<String> actionsList;
 	
 	private void startLoggerService() { //jeśli internet jest włączony, oba provider-y będą działać
 		
@@ -89,8 +90,31 @@ public class GPSService extends Service {
 			double currentLocation[] = new double[2];
 			if (loc != null /*&& firstFix*/) { //zbieranie punkt�w, gdy �ledzenie trasy zosta�o w��czone oraz je�li jest fix
 				try {
+					Log.i("GPSSerive", "New Point: "+loc.getLatitude()+" "+loc.getLongitude());
 					if (loc.hasAccuracy() && loc.getAccuracy() <= minAccuracyMeters) { //punkt zostaje zapisany, je�li minimalna dok�adno�� jest przekroczona
-						
+						ArrayList<Integer> markerIndices = isLocationInMarkersRange(locList, loc);
+						if(!markerIndices.isEmpty()) {
+							for(int i=0; i<markerIndices.size(); i++) {
+								if(actionsList.get(markerIndices.get(i)).equalsIgnoreCase(Action.MUTEPHONE)) {
+									MutePhoneAction mute = new MutePhoneAction();
+									mute.execute(getApplicationContext());
+									Log.i("GPSService", "MutePhone executed");
+									actionsList.remove(markerIndices.get(i));
+									locList.remove(markerIndices.get(i));
+									radiusList.remove(markerIndices.get(i));
+								}
+								if(actionsList.get(markerIndices.get(i)).equalsIgnoreCase(Action.SENDSMS)) {
+									SendSMSAction sms = new SendSMSAction();
+									sms.setDestinationAddress("509121970"); //zamienic na wartosc pobrana z bazy danych
+									sms.setText("test"); //zamienic na wartosc pobrana z bazy danych
+									sms.execute(getApplicationContext());
+									Log.i("GPSService", "SendSMS executed");
+									actionsList.remove(markerIndices.get(i));
+									locList.remove(markerIndices.get(i));
+									radiusList.remove(markerIndices.get(i));
+								}
+							}
+						}
 					} 
 				} catch (Exception e) {
 					Log.e(tag , e.toString());
@@ -157,9 +181,10 @@ public class GPSService extends Service {
 		locList = new ArrayList<Location>();
 		db = new DatabaseHandler(this);
 		Calendar cal = Calendar.getInstance();
-		currentDate = timestampFormat.format(cal.getTime());
+		currentDate = timestampFormat.format(cal.getTime()).substring(0, timestampFormat.format(cal.getTime()).length()-9);
 		markerLocations = db.getTasksCoordinatesForDay(currentDate);
 		radiusList = db.getTasksRadiiForDay(currentDate);
+		actionsList = db.getActionsForDay(currentDate);
 		
 		if (markerLocations!=null) {
 			for (int j = 0; j < markerLocations.length; j++) {
@@ -222,17 +247,22 @@ public class GPSService extends Service {
 		return distance;
 	}
 	
-	private boolean isLocationInMarkersRange(ArrayList<Location> locationList, Location newLocation) {
-		boolean isInRange = false;
+	/**
+	 * Zwraca tablice ArrayList<Integer> indeksów listy markerów locList, w pobliżu których znajduje się nowa pozycja
+	 * @param locationList
+	 * @param newLocation
+	 * @return 
+	 */
+	private ArrayList<Integer> isLocationInMarkersRange(ArrayList<Location> locationList, Location newLocation) {
+		ArrayList<Integer> markersInRange = new ArrayList<Integer>();
 		for(int i = 0; i<locList.size(); i++) {
 			double distance = calculateDistance(newLocation, locList.get(i));
-			if(distance<=radiusList[i]) {
-				isInRange = true;
-				break;
+			if(distance<=radiusList.get(i)) {
+				markersInRange.add(i);
 			}
 		}
 		
-		return isInRange;
+		return markersInRange;
 	}
 
 	public class LocalBinder extends Binder {

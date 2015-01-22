@@ -416,8 +416,8 @@ System.out.println("tutaj");
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(resultCode==RESULT_OK) {
-			data.getDoubleExtra("latitude", 0.0);
-			data.getDoubleExtra("longitude", 0.0);
+			latitude = data.getDoubleExtra("latitude", 0.0);
+			longitude = data.getDoubleExtra("longitude", 0.0);
 		}
 	}
 

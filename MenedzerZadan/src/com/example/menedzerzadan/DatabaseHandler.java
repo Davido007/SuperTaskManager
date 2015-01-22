@@ -193,19 +193,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param date
 	 * @return
 	 */
-	public double[] getTasksRadiiForDay(String date) {
+	public ArrayList<Double> getTasksRadiiForDay(String date) {
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
-		double[] result = null;
+		ArrayList<Double> result = new ArrayList<Double>();
 		try {
 			db = this.getReadableDatabase();
 			cursor = db.rawQuery("SELECT RADIUS" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' ORDER BY ID ASC", null);
             int radiusColumnIndex = cursor.getColumnIndexOrThrow("RADIUS");
-            result = new double[cursor.getCount()];
 			if (cursor.moveToFirst()) {
 				do {
 					double radius = cursor.getDouble(radiusColumnIndex);
-					result[cursor.getPosition()] = radius;
+					result.add(radius);
 				} while (cursor.moveToNext());
 			}
 		} catch (Exception e) {
@@ -221,6 +220,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return result;
 	}
 	
+	/**
+	 * Zwraca akcje do wykonania w danym dniu
+	 * @param date
+	 * @return
+	 */
+	public ArrayList<String> getActionsForDay(String date) {
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			db = this.getReadableDatabase();
+			cursor = db.rawQuery("SELECT ACTION" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' ORDER BY ID ASC", null);
+            int actionColumnIndex = cursor.getColumnIndexOrThrow("ACTION");
+			if (cursor.moveToFirst()) {
+				do {
+					String action = cursor.getString(actionColumnIndex);
+					result.add(action);
+				} while (cursor.moveToNext());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (cursor != null && !cursor.isClosed()) {
+				cursor.close();
+			}
+			if (db != null && db.isOpen()) {
+				db.close();
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Zwraca zadania dla danego dnia
+	 * @param date
+	 * @return
+	 */
 	public ArrayList<String> getTasksForDay(String date) {
 		SQLiteDatabase db = null;
 		Cursor cursor = null;

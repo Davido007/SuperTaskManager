@@ -165,6 +165,7 @@ public class ListaZadan extends Activity {
 	    	    	else if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wyślij smsa")) chosenAction = Action.SENDSMS;
 	    			
 	    			db.addTask(date, date, godzinaStartu+":"+minutaStartu, godzinaKonca+":"+minutaKonca, latitude, longitude, chosenAction, opisZadania, Double.parseDouble(radiusEditText.getText().toString()));
+	    			startService(new Intent(ListaZadan.this, GPSService.class));
 	    			list.add(i,zadanie);
 	    			break;
 	    		}
@@ -178,6 +179,7 @@ public class ListaZadan extends Activity {
 	    	db.addTask(date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
 	    			czasKonca.getCurrentHour().toString()+":"+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
 	    			chosenAction, editText.getText().toString(), Double.parseDouble(radiusEditText.getText().toString()));
+	    	startService(new Intent(ListaZadan.this, GPSService.class));
 	    	adapter = new StableArrayAdapter(context,android.R.layout.simple_list_item_1, list);
 	    	ZapisDoPliku(list,name);
 	    	listview.setAdapter(adapter);

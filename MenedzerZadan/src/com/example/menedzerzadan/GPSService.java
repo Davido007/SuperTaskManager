@@ -102,6 +102,7 @@ public class GPSService extends Service {
 									actionsList.remove(markerIndices.get(i));
 									locList.remove(markerIndices.get(i));
 									radiusList.remove(markerIndices.get(i));
+									markerIndices.remove(markerIndices.get(i));
 								}
 								if(actionsList.get(markerIndices.get(i)).equalsIgnoreCase(Action.SENDSMS)) {
 									SendSMSAction sms = new SendSMSAction();
@@ -112,6 +113,7 @@ public class GPSService extends Service {
 									actionsList.remove(markerIndices.get(i));
 									locList.remove(markerIndices.get(i));
 									radiusList.remove(markerIndices.get(i));
+									markerIndices.remove(markerIndices.get(i));
 								}
 							}
 						}
@@ -205,6 +207,29 @@ public class GPSService extends Service {
 		startLoggerService();
 		showNotification();
 	}
+	
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		super.onStartCommand(intent, flags, startId);
+		locList.clear();
+		radiusList.clear();
+		actionsList.clear();
+		markerLocations = db.getTasksCoordinatesForDay(currentDate);
+		radiusList = db.getTasksRadiiForDay(currentDate);
+		actionsList = db.getActionsForDay(currentDate);
+		
+		if (markerLocations!=null) {
+			for (int j = 0; j < markerLocations.length; j++) {
+				Location loc = new Location("imaginaryprovider");
+				loc.setLongitude(markerLocations[j][0]);
+				loc.setLatitude(markerLocations[j][1]);
+				locList.add(loc);
+			}
+		}
+		
+		return Service.START_NOT_STICKY;
+		
+	}
 
 	@Override
 	public void onDestroy() {
@@ -257,6 +282,7 @@ public class GPSService extends Service {
 		ArrayList<Integer> markersInRange = new ArrayList<Integer>();
 		for(int i = 0; i<locList.size(); i++) {
 			double distance = calculateDistance(newLocation, locList.get(i));
+			Log.i("GPSService", "New points distance: "+distance);
 			if(distance<=radiusList.get(i)) {
 				markersInRange.add(i);
 			}

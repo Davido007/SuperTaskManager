@@ -26,6 +26,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_DESCRIPTION = "DESCRIPTION";
 	private static final String KEY_ACTION = "ACTION"; //akcja do wykonania przy danym zadaniu
 	private static final String KEY_RADIUS = "RADIUS";
+	private static final String KEY_TELEPHONE = "TELEPHONE";
+	private static final String KEY_SMSTEXT = "SMSTEXT";
+	
 
 	public DatabaseHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -46,8 +49,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ENDTIME + " TEXT, " 
 				+ KEY_LATITUDE + " REAL, " 
 				+ KEY_LONGITUDE + " REAL, " 
+				+ KEY_ACTION + " TEXT, "
 				+ KEY_DESCRIPTION + " TEXT, "
-				+ KEY_ACTION + " TEXT, " 
+				+ KEY_TELEPHONE + " TEXT, "
+				+ KEY_SMSTEXT + " TEXT, "
 				+ KEY_RADIUS + " REAL)";
 		db.execSQL(CREATE_TASKS_TABLE);
 		
@@ -63,7 +68,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	
 	public void addTask(String startDate, String endDate, String startTime, String endTime, 
-			double latitude, double longitude, String action, String description, double radius) {
+			double latitude, double longitude, String action, String description, String telephone, String smsText, double radius) {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -73,8 +78,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_ENDTIME, endTime);
 		values.put(KEY_LATITUDE, latitude);
 		values.put(KEY_LONGITUDE, longitude);
-		values.put(KEY_DESCRIPTION, description);
 		values.put(KEY_ACTION, action);
+		values.put(KEY_DESCRIPTION, description);
+		values.put(KEY_TELEPHONE, telephone);
+		values.put(KEY_SMSTEXT, smsText);
 		values.put(KEY_RADIUS, radius);
 		db.insert(TASKS_TABLE_NAME, null, values);
 	}
@@ -251,6 +258,72 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		return result;
 	}
+	
+	/**
+	 * Zwraca numery telefonu w danym dniu
+	 * @param date
+	 * @return
+	 */
+	public ArrayList<String> getTelephoneForDay(String date) {
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			db = this.getReadableDatabase();
+			cursor = db.rawQuery("SELECT TELEPHONE" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' ORDER BY ID ASC", null);
+            int telephoneColumnIndex = cursor.getColumnIndexOrThrow("TELEPHONE");
+			if (cursor.moveToFirst()) {
+				do {
+					String telephone = cursor.getString(telephoneColumnIndex);
+					result.add(telephone);
+				} while (cursor.moveToNext());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (cursor != null && !cursor.isClosed()) {
+				cursor.close();
+			}
+			if (db != null && db.isOpen()) {
+				db.close();
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Zwraca tresci smsa w danym dniu
+	 * @param date
+	 * @return
+	 */
+	public ArrayList<String> getSMSTextForDay(String date) {
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		ArrayList<String> result = new ArrayList<String>();
+		try {
+			db = this.getReadableDatabase();
+			cursor = db.rawQuery("SELECT SMSTEXT" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' ORDER BY ID ASC", null);
+            int smsTextColumnIndex = cursor.getColumnIndexOrThrow("SMSTEXT");
+			if (cursor.moveToFirst()) {
+				do {
+					String smsText = cursor.getString(smsTextColumnIndex);
+					result.add(smsText);
+				} while (cursor.moveToNext());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (cursor != null && !cursor.isClosed()) {
+				cursor.close();
+			}
+			if (db != null && db.isOpen()) {
+				db.close();
+			}
+		}
+		return result;
+	}
+	
+	
 	
 	/**
 	 * Zwraca zadania dla danego dnia

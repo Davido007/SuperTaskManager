@@ -45,7 +45,6 @@ public class GPSService extends Service {
 	private static final String tag = "RouteTracingService";
 	private SharedPreferences prefs;
 	private GPSStatusListener gpsStatusListener;
-	private SensorManager sensorMgr;
 	private DatabaseHandler db;
 	public static LatLng startingLocation;
 	private ArrayList<Location> locList;
@@ -54,6 +53,8 @@ public class GPSService extends Service {
 	private final DateFormat timestampFormat = DateFormat.getDateTimeInstance();
 	private String currentDate;
 	private ArrayList<String> actionsList;
+	private ArrayList<String> telephoneList;
+	private ArrayList<String> smsTextList;
 	
 	private void startLoggerService() { //jeśli internet jest włączony, oba provider-y będą działać
 		
@@ -106,8 +107,8 @@ public class GPSService extends Service {
 								}
 								if(actionsList.get(markerIndices.get(i)).equalsIgnoreCase(Action.SENDSMS)) {
 									SendSMSAction sms = new SendSMSAction();
-									sms.setDestinationAddress("509121970"); //zamienic na wartosc pobrana z bazy danych
-									sms.setText("test"); //zamienic na wartosc pobrana z bazy danych
+									sms.setDestinationAddress(telephoneList.get(markerIndices.get(i))); //zamienic na wartosc pobrana z bazy danych
+									sms.setText(smsTextList.get(markerIndices.get(i))); //zamienic na wartosc pobrana z bazy danych
 									sms.execute(getApplicationContext());
 									Log.i("GPSService", "SendSMS executed");
 									actionsList.remove(markerIndices.get(i));
@@ -187,6 +188,8 @@ public class GPSService extends Service {
 		markerLocations = db.getTasksCoordinatesForDay(currentDate);
 		radiusList = db.getTasksRadiiForDay(currentDate);
 		actionsList = db.getActionsForDay(currentDate);
+		telephoneList = db.getTelephoneForDay(currentDate);
+		smsTextList = db.getSMSTextForDay(currentDate);
 		
 		if (markerLocations!=null) {
 			for (int j = 0; j < markerLocations.length; j++) {
@@ -199,7 +202,6 @@ public class GPSService extends Service {
 		prefs = getSharedPreferences("preferences", 0);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		super.onCreate();
-		sensorMgr = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		locationListener = new MyLocationListener();
 		gpsStatusListener = new GPSStatusListener();
@@ -214,9 +216,13 @@ public class GPSService extends Service {
 		locList.clear();
 		radiusList.clear();
 		actionsList.clear();
+		telephoneList.clear();
+		smsTextList.clear();
 		markerLocations = db.getTasksCoordinatesForDay(currentDate);
 		radiusList = db.getTasksRadiiForDay(currentDate);
 		actionsList = db.getActionsForDay(currentDate);
+		telephoneList = db.getTelephoneForDay(currentDate);
+		smsTextList = db.getSMSTextForDay(currentDate);
 		
 		if (markerLocations!=null) {
 			for (int j = 0; j < markerLocations.length; j++) {

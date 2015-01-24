@@ -16,6 +16,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -63,6 +65,12 @@ public class ListaZadan extends Activity {
 	private DatabaseHandler db;
 	private ArrayAdapter<CharSequence> spinnerAdapter;
 	private String chosenAction;
+	private String telephone;
+	private String smsText;
+	private EditText telephoneEditText;
+	private EditText smsTextEditText;
+	private LayoutInflater inflater;
+	private View dialogLayout;
 	/**
 	 * Metoda odpowiedzialna za wyswietlenie listy zada� oraz przycisku (dodaj zadanie)
 	 */
@@ -80,9 +88,34 @@ public class ListaZadan extends Activity {
 	final EditText radiusEditText = (EditText) view.findViewById(R.id.radiusEditText);
 	final Spinner chooseActionSpinner = (Spinner) view.findViewById(R.id.chooseActionSpinner);
 	
+	inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+    dialogLayout = inflater.inflate(R.layout.smsdialog_layout,(ViewGroup) findViewById(R.layout.smsdialog_layout));
+	telephoneEditText = (EditText) dialogLayout.findViewById(R.id.telephoneEditText);
+    smsTextEditText = (EditText) dialogLayout.findViewById(R.id.smsTextEditText);
+	
 	spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.actionSpinner, android.R.layout.simple_spinner_dropdown_item);
 	spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 	chooseActionSpinner.setAdapter(spinnerAdapter);
+	
+	chooseActionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {                
+
+            if(position==1) smsActionChosenDialog();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+        }
+    });  
+/*	View sendSMSoption = chooseActionSpinner.getChildAt(1);
+	sendSMSoption.setOnClickListener(new View.OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			smsActionChosenDialog();
+		}
+	});*/
 	
 	final ListView listview = (ListView) findViewById(R.id.listView1);   //lista na ekranie glownym
     final AlertDialog.Builder oknoZadania = new AlertDialog.Builder(this);  // okno zadania
@@ -163,8 +196,12 @@ public class ListaZadan extends Activity {
 	    			
 	    			if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wycisz telefon")) chosenAction = Action.MUTEPHONE;
 	    	    	else if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wyślij smsa")) chosenAction = Action.SENDSMS;
+	    	    	
 	    			
-	    			db.addTask(date, date, godzinaStartu+":"+minutaStartu, godzinaKonca+":"+minutaKonca, latitude, longitude, chosenAction, opisZadania, Double.parseDouble(radiusEditText.getText().toString()));
+	    			db.addTask(date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
+	    	    			czasKonca.getCurrentHour().toString()+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
+	    	    			chosenAction, editText.getText().toString(), telephone, smsText, Double.parseDouble(radiusEditText.getText().toString()));
+	    			
 	    			startService(new Intent(ListaZadan.this, GPSService.class));
 	    			list.add(i,zadanie);
 	    			break;
@@ -177,8 +214,8 @@ public class ListaZadan extends Activity {
 	    	else if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wyślij smsa")) chosenAction = Action.SENDSMS;
 	    	
 	    	db.addTask(date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
-	    			czasKonca.getCurrentHour().toString()+":"+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
-	    			chosenAction, editText.getText().toString(), Double.parseDouble(radiusEditText.getText().toString()));
+	    			czasKonca.getCurrentHour().toString()+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
+	    			chosenAction, editText.getText().toString(), telephone, smsText, Double.parseDouble(radiusEditText.getText().toString()));
 	    	startService(new Intent(ListaZadan.this, GPSService.class));
 	    	adapter = new StableArrayAdapter(context,android.R.layout.simple_list_item_1, list);
 	    	ZapisDoPliku(list,name);
@@ -323,7 +360,7 @@ System.out.println("tutaj");
    * 
    * @param zadanie
    */
-  public void przetworzStringa(String zadanie){
+  public void przetworzStringa(String zadanie) {
 	  String przedzialCzasowyZadania="";
 		int koniecGodzinyStartuWStringu = 0;
 		int koniecMinutyStartuWStringu = 0;
@@ -413,6 +450,24 @@ System.out.println("tutaj");
     }
 
   }
+  
+	public void smsActionChosenDialog() {
+		
+		final Builder dialog = new AlertDialog.Builder(this);
+		dialog.setTitle("SMS");
+        dialog.setView(dialogLayout);
+        
+        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+			@Override
+            public void onClick(DialogInterface dialog, int which) {
+            	telephone = telephoneEditText.getText().toString();
+            	smsText = smsTextEditText.getText().toString();
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+	}
   
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -195,25 +195,28 @@ containing a value of this type.
     public static final class id {
         public static final int RelativeLayout3=0x7f050005;
         public static final int TimePicker01=0x7f05000d;
-        public static final int action_settings=0x7f050017;
+        public static final int action_settings=0x7f05001a;
         public static final int addDayTaskButton=0x7f050008;
-        public static final int addTaskButton=0x7f050016;
+        public static final int addTaskButton=0x7f050019;
         public static final int chooseActionSpinner=0x7f050012;
         public static final int chooseActionTextView=0x7f050011;
-        public static final int datePicker1=0x7f050013;
+        public static final int datePicker1=0x7f050016;
         public static final int editDayTaskButton=0x7f050009;
         public static final int hybrid=0x7f050004;
-        public static final int linearLayout1=0x7f050014;
-        public static final int listView1=0x7f050015;
+        public static final int linearLayout1=0x7f050017;
+        public static final int listView1=0x7f050018;
         public static final int locationButton=0x7f05000f;
         public static final int map=0x7f050006;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
         public static final int radiusEditText=0x7f05000e;
         public static final int satellite=0x7f050002;
+        public static final int smsTextEditText=0x7f050015;
+        public static final int smsTextTextView=0x7f050014;
         public static final int taskNameEditText=0x7f050010;
+        public static final int telephoneEditText=0x7f050013;
+        public static final int telephoneNumberTextView=0x7f050007;
         public static final int terrain=0x7f050003;
-        public static final int textView1=0x7f050007;
         public static final int textView2=0x7f05000b;
         public static final int textView3=0x7f05000a;
         public static final int timePicker1=0x7f05000c;
@@ -222,8 +225,9 @@ containing a value of this type.
         public static final int activity_map=0x7f030000;
         public static final int activity_menedzer_zadan=0x7f030001;
         public static final int nowe_zadanie=0x7f030002;
-        public static final int text_entry=0x7f030003;
-        public static final int zadania_dnia=0x7f030004;
+        public static final int smsdialog_layout=0x7f030003;
+        public static final int text_entry=0x7f030004;
+        public static final int zadania_dnia=0x7f030005;
     }
     public static final class menu {
         public static final int menedzer_zadan=0x7f0a0000;

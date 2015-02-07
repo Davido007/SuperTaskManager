@@ -32,6 +32,7 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
 	private double radius;
 	private int markerCount = 0;
 	private Circle circle;
+	private Marker marker;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,13 +98,13 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
     
     @Override
     public boolean onMarkerClick(final Marker marker) {
-    	
+/*    	
     	marker.remove();
     	circle.remove();
     	markerCount--;
     	data.removeExtra("latitude");
     	data.removeExtra("longitude");
-    	setResult(RESULT_CANCELED);
+    	setResult(RESULT_CANCELED);*/
     	return false;
     }
     
@@ -117,7 +118,7 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
 		public void onMapClick(LatLng arg0) {
 			if (markerCount==0) {
 				// TODO Auto-generated method stub
-				mMap.addMarker(new MarkerOptions()
+				marker = mMap.addMarker(new MarkerOptions()
 						.position(arg0)
 						.icon(BitmapDescriptorFactory
 								.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
@@ -128,6 +129,14 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
 				data.putExtra("latitude", arg0.latitude);
 				data.putExtra("longitude", arg0.longitude);
 				setResult(RESULT_OK, data);
+			} else {
+				marker.remove();
+		    	circle.remove();
+		    	markerCount--;
+		    	data.removeExtra("latitude");
+		    	data.removeExtra("longitude");
+		    	markerCount = 0;
+		    	setResult(RESULT_CANCELED);
 			}
 			
 

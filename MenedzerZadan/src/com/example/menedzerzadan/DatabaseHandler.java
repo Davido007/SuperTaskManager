@@ -122,8 +122,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		SQLiteDatabase db = null;
 		db = this.getWritableDatabase();
 		//db.execSQL("PRAGMA foreign_keys = ON;");
-    	db.execSQL("DELETE FROM "+TASKS_TABLE_NAME+" WHERE STARTTIME='"+startTime+"' AND WHERE ENDTIME='"+endTime
-    			+"' AND WHERE STARTDATE='"+startDate+"' AND WHERE ENDTIME='"+endTime+"' AND DESCRIPTION='"+opis+"'");
+    	db.execSQL("DELETE FROM "+TASKS_TABLE_NAME+" WHERE STARTTIME='"+startTime+"' AND ENDTIME='"+endTime
+    			+"' AND STARTDATE='"+startDate+"' AND ENDDATE='"+endDate+"' AND DESCRIPTION='"+opis+"'");
 		if (db.isOpen()) db.close();
 		}
 	

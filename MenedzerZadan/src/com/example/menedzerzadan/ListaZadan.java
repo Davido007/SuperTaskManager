@@ -147,7 +147,7 @@ public class ListaZadan extends Activity {
 	 */
     final DialogInterface.OnClickListener Clickacz=new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int which) {
-        	//db.deleteSinglePositionFromSavedTasks(godzinaStartu+":"+minutaStartu, godzinaKonca+":"+minutaKonca, date, date, opisZadania);
+        	db.deleteSinglePositionFromSavedTasks(godzinaStartu+":"+minutaStartu, godzinaKonca+":"+minutaKonca, date, date, opisZadania);
         	ZapisDoPliku(list,name);
         	adapter.notifyDataSetChanged();
         	((ViewGroup)view.getParent()).removeView(view);
@@ -234,6 +234,7 @@ public class ListaZadan extends Activity {
     addButton.setOnClickListener(new Button.OnClickListener(){
     	  @Override
     	  public void onClick(View arg0) {
+    		  opisZadania="";
     		  oknoZadania.setNegativeButton("Cofnij", Clickacz);
     		  oknoZadania.show(); 
     		  
@@ -272,7 +273,6 @@ public class ListaZadan extends Activity {
     	    		editText.setText(opisZadania);
     	    		oknoZadania.setNegativeButton("Usun", Clickacz);
     	    		oknoZadania.show();
-            	    opisZadania="";
             	    list.remove(item);
             	    view.setAlpha(1);
               }

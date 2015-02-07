@@ -103,7 +103,7 @@ public class GPSService extends Service {
 									actionsList.remove(markerIndices.get(i));
 									locList.remove(markerIndices.get(i));
 									radiusList.remove(markerIndices.get(i));
-									markerIndices.remove(markerIndices.get(i));
+									markerIndices.remove(i);
 								}
 								if(actionsList.get(markerIndices.get(i)).equalsIgnoreCase(Action.SENDSMS)) {
 									SendSMSAction sms = new SendSMSAction();
@@ -114,7 +114,7 @@ public class GPSService extends Service {
 									actionsList.remove(markerIndices.get(i));
 									locList.remove(markerIndices.get(i));
 									radiusList.remove(markerIndices.get(i));
-									markerIndices.remove(markerIndices.get(i));
+									markerIndices.remove(i);
 								}
 							}
 						}

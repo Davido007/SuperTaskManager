@@ -28,6 +28,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_RADIUS = "RADIUS";
 	private static final String KEY_TELEPHONE = "TELEPHONE";
 	private static final String KEY_SMSTEXT = "SMSTEXT";
+	private static final String KEY_EXECUTED = "EXECUTED";
 	
 
 	public DatabaseHandler(Context context) {
@@ -53,6 +54,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_DESCRIPTION + " TEXT, "
 				+ KEY_TELEPHONE + " TEXT, "
 				+ KEY_SMSTEXT + " TEXT, "
+				+ KEY_EXECUTED + " INTEGER DEFAULT 0, "
 				+ KEY_RADIUS + " REAL)";
 		db.execSQL(CREATE_TASKS_TABLE);
 		
@@ -107,12 +109,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public void updateLatitudeLongitudeZadania(double oldLatitude, double oldLongitude, 
-			double newLatitude, double newLongitude, String opis) {
+			double newLatitude, double newLongitude, String description) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(KEY_LATITUDE, newLatitude);
 		values.put(KEY_LONGITUDE, newLongitude);
-		String whereClause = "LATITUDE='"+oldLatitude+"'"+" AND LONGITUDE='"+oldLongitude+"'"+" AND DESCRIPTION='"+opis+"'";
+		String whereClause = "LATITUDE='"+oldLatitude+"'"+" AND LONGITUDE='"+oldLongitude+"'"+" AND DESCRIPTION='"+description+"'";
+		db.update(TASKS_TABLE_NAME, values, whereClause, null);
+		db.close();
+	}
+	
+	/**
+	 * Oznaczenie zadania z danego dnia jako wykonane
+	 * @param startTime
+	 * @param endTime
+	 * @param description
+	 */
+	public void updateTaskExecuted(String startTime, String endTime, String startDate, String description) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(KEY_EXECUTED, 1);
+		String whereClause = KEY_STARTTIME+"='"+startTime+"'"+" AND "+KEY_ENDTIME+"='"+endTime+"'"+" AND "+KEY_STARTDATE+"='"
+								+startDate+"'"+" AND "+KEY_DESCRIPTION+"='"+description+"'";
 		db.update(TASKS_TABLE_NAME, values, whereClause, null);
 		db.close();
 	}

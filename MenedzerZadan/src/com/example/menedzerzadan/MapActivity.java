@@ -81,15 +81,17 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
                 	
                     LatLngBounds.Builder bounds = new LatLngBounds.Builder();
                     
-                    if(GPSService.startingLocation!=null) bounds.include(GPSService.startingLocation);
-                    else return;
+                    /*if(GPSService.startingLocation!=null) {
+                    	bounds.include(GPSService.startingLocation);
+                    } else return;*/
+                    
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                         mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                       } else {
                         mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                       }
-                      mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 50));
-                      mMap.animateCamera(CameraUpdateFactory.zoomOut());
+                      //mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 50));
+                      if(GPSService.startingLocation!=null) mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(GPSService.startingLocation, 18));
                 }
             });
         }

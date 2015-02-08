@@ -42,7 +42,7 @@ public class GPSService extends Service {
 	private int lastStatus = 0;
 	private static boolean showingDebugToast = false;
 	private NotificationManager mNotificationManager;
-	private static final String tag = "RouteTracingService";
+	private static final String tag = "GPSService";
 	private SharedPreferences prefs;
 	private GPSStatusListener gpsStatusListener;
 	private DatabaseHandler db;
@@ -96,24 +96,25 @@ public class GPSService extends Service {
 						ArrayList<Integer> markerIndices = isLocationInMarkersRange(locList, loc);
 						if(!markerIndices.isEmpty()) {
 							for(int i=0; i<markerIndices.size(); i++) {
-								if(actionsList.get(markerIndices.get(i)).equalsIgnoreCase(Action.MUTEPHONE)) {
+								int currentIndex = markerIndices.get(i);
+								if(actionsList.get(currentIndex).equalsIgnoreCase(Action.MUTEPHONE)) {
 									MutePhoneAction mute = new MutePhoneAction();
 									mute.execute(getApplicationContext());
 									Log.i("GPSService", "MutePhone executed");
-									actionsList.remove(markerIndices.get(i));
-									locList.remove(markerIndices.get(i));
-									radiusList.remove(markerIndices.get(i));
+									actionsList.remove(currentIndex);
+									locList.remove(currentIndex);
+									radiusList.remove(currentIndex);
 									markerIndices.remove(i);
 								}
 								if(actionsList.get(markerIndices.get(i)).equalsIgnoreCase(Action.SENDSMS)) {
-									SendSMSAction sms = new SendSMSAction();
-									sms.setDestinationAddress(telephoneList.get(markerIndices.get(i))); //zamienic na wartosc pobrana z bazy danych
-									sms.setText(smsTextList.get(markerIndices.get(i))); //zamienic na wartosc pobrana z bazy danych
+									SendSMSAction sms = new SendSMSAction(getApplicationContext());
+									sms.setDestinationAddress(telephoneList.get(currentIndex)); //zamienic na wartosc pobrana z bazy danych
+									sms.setText(smsTextList.get(currentIndex)); //zamienic na wartosc pobrana z bazy danych
 									sms.execute(getApplicationContext());
 									Log.i("GPSService", "SendSMS executed");
-									actionsList.remove(markerIndices.get(i));
-									locList.remove(markerIndices.get(i));
-									radiusList.remove(markerIndices.get(i));
+									actionsList.remove(currentIndex);
+									locList.remove(currentIndex);
+									radiusList.remove(currentIndex);
 									markerIndices.remove(i);
 								}
 							}

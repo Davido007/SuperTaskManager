@@ -105,6 +105,7 @@ public class GPSService extends Service {
 									locList.remove(currentIndex);
 									radiusList.remove(currentIndex);
 									markerIndices.remove(i);
+									//db.updateTaskExecuted(startTime, endTime, startDate, description);
 								}
 								if(actionsList.get(markerIndices.get(i)).equalsIgnoreCase(Action.SENDSMS)) {
 									SendSMSAction sms = new SendSMSAction(getApplicationContext());

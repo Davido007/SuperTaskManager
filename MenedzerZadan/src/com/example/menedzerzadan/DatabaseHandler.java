@@ -88,6 +88,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.insert(TASKS_TABLE_NAME, null, values);
 	}
 	
+	public void updateTask(String oldStartDate, String oldEndDate, String oldStartTime, String oldEndTime, 
+			double oldLatitude, double oldLongitude, String oldAction, String oldDescription, String oldTelephone, String oldSmsText, double oldRadius, 
+			String startDate, String endDate, String startTime, String endTime, 
+			double latitude, double longitude, String action, String description, String telephone, String smsText, double radius) {
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(KEY_STARTDATE, startDate);
+		values.put(KEY_ENDDATE, endDate);
+		values.put(KEY_STARTTIME, startTime);
+		values.put(KEY_ENDTIME, endTime);
+		values.put(KEY_LATITUDE, latitude);
+		values.put(KEY_LONGITUDE, longitude);
+		values.put(KEY_ACTION, action);
+		values.put(KEY_DESCRIPTION, description);
+		values.put(KEY_TELEPHONE, telephone);
+		values.put(KEY_SMSTEXT, smsText);
+		values.put(KEY_RADIUS, radius);
+		
+		String whereClause = KEY_STARTTIME+"='"+oldStartTime+"'"+" AND "+KEY_ENDTIME+"='"+oldEndTime+"'"+" AND "+KEY_STARTDATE+"='"
+							 +oldStartDate+"'"+" AND "+KEY_DESCRIPTION+"='"+oldDescription+"'";
+		db.update(TASKS_TABLE_NAME, values, whereClause, null);
+	}
 	
 	public void deleteAllResults() throws Exception {
 		SQLiteDatabase db = null;
@@ -188,7 +211,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		double[][] result = null;
 		try {
 			db = this.getReadableDatabase();
-			cursor = db.rawQuery("SELECT LONGITUDE, LATITUDE" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' ORDER BY ID ASC", null);
+			cursor = db.rawQuery("SELECT LONGITUDE, LATITUDE, EXECUTED" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' AND EXECUTED=1 ORDER BY ID ASC", null);
             int longitudeColumnIndex = cursor.getColumnIndexOrThrow("LONGITUDE");
             int latitudeColumnIndex = cursor.getColumnIndexOrThrow("LATITUDE");
             result = new double[cursor.getCount()][2];
@@ -224,7 +247,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<Double> result = new ArrayList<Double>();
 		try {
 			db = this.getReadableDatabase();
-			cursor = db.rawQuery("SELECT RADIUS" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' ORDER BY ID ASC", null);
+			cursor = db.rawQuery("SELECT RADIUS, EXECUTED" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' AND EXECUTED=1 ORDER BY ID ASC", null);
             int radiusColumnIndex = cursor.getColumnIndexOrThrow("RADIUS");
 			if (cursor.moveToFirst()) {
 				do {
@@ -256,7 +279,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<String> result = new ArrayList<String>();
 		try {
 			db = this.getReadableDatabase();
-			cursor = db.rawQuery("SELECT ACTION" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' ORDER BY ID ASC", null);
+			cursor = db.rawQuery("SELECT ACTION, EXECUTED" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' AND EXECUTED=1 ORDER BY ID ASC", null);
             int actionColumnIndex = cursor.getColumnIndexOrThrow("ACTION");
 			if (cursor.moveToFirst()) {
 				do {
@@ -288,7 +311,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<String> result = new ArrayList<String>();
 		try {
 			db = this.getReadableDatabase();
-			cursor = db.rawQuery("SELECT TELEPHONE" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' ORDER BY ID ASC", null);
+			cursor = db.rawQuery("SELECT TELEPHONE, EXECUTED" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' AND EXECUTED=1 ORDER BY ID ASC", null);
             int telephoneColumnIndex = cursor.getColumnIndexOrThrow("TELEPHONE");
 			if (cursor.moveToFirst()) {
 				do {
@@ -320,7 +343,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<String> result = new ArrayList<String>();
 		try {
 			db = this.getReadableDatabase();
-			cursor = db.rawQuery("SELECT SMSTEXT" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' ORDER BY ID ASC", null);
+			cursor = db.rawQuery("SELECT SMSTEXT, EXECUTED" + " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='" + date + "' AND EXECUTED=1 ORDER BY ID ASC", null);
             int smsTextColumnIndex = cursor.getColumnIndexOrThrow("SMSTEXT");
 			if (cursor.moveToFirst()) {
 				do {
@@ -378,6 +401,52 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * Zwraca dane do wypelnienia okna edycji zadania result[0] - radius 1 - latitude 2 - longitude
+	 * @param date
+	 * @return
+	 */
+	public void getTaskData(String date, String description, String startTime, String endTime, double[] result, String action, String telephone, String smsText) {
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		
+		try {
+			db = this.getReadableDatabase();
+			cursor = db.rawQuery("SELECT STARTTIME, ENDTIME, DESCRIPTION, RADIUS, LATITUDE, LONGITUDE, ACTION, TELEPHONE, SMSTEXT" 
+								+ " FROM " + TASKS_TABLE_NAME + " WHERE STARTDATE='"+date+"' AND "+KEY_STARTTIME+"='"+startTime+
+								"' AND "+KEY_ENDTIME+"='"+endTime+"' AND "+KEY_DESCRIPTION+"='"+description+"' ORDER BY ID ASC", null);
+            int radiusColumnIndex = cursor.getColumnIndexOrThrow(KEY_RADIUS);
+            int latitudeColumnIndex = cursor.getColumnIndexOrThrow(KEY_LATITUDE);
+            int longitudeColumnIndex = cursor.getColumnIndexOrThrow(KEY_LONGITUDE);
+            int actionColumnIndex = cursor.getColumnIndexOrThrow(KEY_ACTION);
+            int telephoneColumnIndex = cursor.getColumnIndexOrThrow(KEY_TELEPHONE);
+            int smsTextColumnIndex = cursor.getColumnIndexOrThrow(KEY_SMSTEXT);
+			if (cursor.moveToFirst()) {
+				do {
+					double radius = cursor.getDouble(radiusColumnIndex);
+					double latitude = cursor.getDouble(latitudeColumnIndex);
+					double longitude = cursor.getDouble(longitudeColumnIndex);
+					telephone = cursor.getString(telephoneColumnIndex);
+					action = cursor.getString(actionColumnIndex);
+					smsText = cursor.getString(smsTextColumnIndex);
+					result[0] = radius;
+					result[1] = latitude;
+					result[2] = longitude;
+					
+				} while (cursor.moveToNext());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (cursor != null && !cursor.isClosed()) {
+				cursor.close();
+			}
+			if (db != null && db.isOpen()) {
+				db.close();
+			}
+		}
 	}
 	
 /*	public double[][] getAllTasksPrzedzialCzasuAndDescription() {

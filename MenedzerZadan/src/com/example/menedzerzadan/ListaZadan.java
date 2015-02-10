@@ -64,13 +64,23 @@ public class ListaZadan extends Activity {
 	double latitude, longitude;
 	private DatabaseHandler db;
 	private ArrayAdapter<CharSequence> spinnerAdapter;
-	private String chosenAction;
-	private String telephone;
-	private String smsText;
+	private String chosenAction = "";
+	private String telephone = "";
+	private String smsText = "";
 	private EditText telephoneEditText;
 	private EditText smsTextEditText;
 	private LayoutInflater inflater;
 	private View dialogLayout;
+	private boolean editTask = false;
+	private double oldRadius;
+	private double oldLatitude;
+	private double oldLongitude;
+	private String oldOpisZadania;
+	private String oldStartTime;
+	private String oldEndTime;
+	private String oldTelephone;
+	private String oldSmsText;
+	private String oldAction;
 	/**
 	 * Metoda odpowiedzialna za wyswietlenie listy zada� oraz przycisku (dodaj zadanie)
 	 */
@@ -198,9 +208,15 @@ public class ListaZadan extends Activity {
 	    	    	else if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wyślij smsa")) chosenAction = Action.SENDSMS;
 	    	    	
 	    			
-	    			db.addTask(date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
-	    	    			czasKonca.getCurrentHour().toString()+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
+	    			if(!editTask) {
+	    				db.addTask(date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
+	    					czasKonca.getCurrentHour().toString()+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
 	    	    			chosenAction, editText.getText().toString(), telephone, smsText, Double.parseDouble(radiusEditText.getText().toString()));
+	    			} else db.updateTask(date, date, oldStartTime, oldEndTime, oldLatitude, oldLongitude, oldAction, oldOpisZadania,
+	    					oldTelephone, oldSmsText, oldRadius, date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
+					czasKonca.getCurrentHour().toString()+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
+	    			chosenAction, editText.getText().toString(), telephone, smsText, Double.parseDouble(radiusEditText.getText().toString()));
+	    	    			
 	    			
 	    			startService(new Intent(ListaZadan.this, GPSService.class));
 	    			list.add(i,zadanie);
@@ -213,9 +229,15 @@ public class ListaZadan extends Activity {
 	    	if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wycisz telefon")) chosenAction = Action.MUTEPHONE;
 	    	else if(chooseActionSpinner.getSelectedItem().toString().equalsIgnoreCase("Wyślij smsa")) chosenAction = Action.SENDSMS;
 	    	
-	    	db.addTask(date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
-	    			czasKonca.getCurrentHour().toString()+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
+	    	if(!editTask) {
+				db.addTask(date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
+					czasKonca.getCurrentHour().toString()+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
 	    			chosenAction, editText.getText().toString(), telephone, smsText, Double.parseDouble(radiusEditText.getText().toString()));
+			} else db.updateTask(date, date, oldStartTime, oldEndTime, oldLatitude, oldLongitude, oldAction, oldOpisZadania,
+					oldTelephone, oldSmsText, oldRadius, date, date, czasStartu.getCurrentHour().toString()+":"+czasStartu.getCurrentMinute().toString(), 
+			czasKonca.getCurrentHour().toString()+":"+czasKonca.getCurrentMinute().toString(), latitude, longitude, 
+			chosenAction, editText.getText().toString(), telephone, smsText, Double.parseDouble(radiusEditText.getText().toString()));
+	    	
 	    	startService(new Intent(ListaZadan.this, GPSService.class));
 	    	adapter = new StableArrayAdapter(context,android.R.layout.simple_list_item_1, list);
 	    	ZapisDoPliku(list,name);
@@ -245,7 +267,9 @@ public class ListaZadan extends Activity {
   	  @Override
   	  public void onClick(View arg0) {
   		  if(isConn()) startActivityForResult(new Intent(ListaZadan.this, MapActivity.class)
-  		  											.putExtra("radius", Double.parseDouble(radiusEditText.getText().toString())), 0);
+  		  											.putExtra("radius", Double.parseDouble(radiusEditText.getText().toString()))
+  		  											.putExtra("latitude", latitude)
+  		  											.putExtra("longitude", longitude), 0);
   		  else Toast.makeText(ListaZadan.this, "Potrzebne polaczenie z internetem", Toast.LENGTH_LONG).show();
   	  }});
     /*
@@ -263,13 +287,36 @@ public class ListaZadan extends Activity {
         int position, long id) {
         final String item = (String) parent.getItemAtPosition(position);
         view.animate().setDuration(1000).alpha(0).withEndAction(new Runnable() {
-              @Override
+              
+
+			@Override
               public void run() {
+            	    editTask = true;
             	    przetworzStringa(item);
             	    czasStartu.setCurrentHour(Integer.valueOf(godzinaStartu));
             	    czasStartu.setCurrentMinute(Integer.valueOf(minutaStartu));
             	    czasKonca.setCurrentHour(Integer.valueOf(godzinaKonca));
             	    czasKonca.setCurrentMinute(Integer.valueOf(minutaKonca));
+            	    oldStartTime = godzinaStartu+":"+minutaStartu;
+            	    oldEndTime = godzinaKonca+":"+minutaKonca;
+            	    double[] radiusAndCoordinates = new double[3];
+            	    db.getTaskData(date, opisZadania, godzinaStartu+":"+minutaStartu, godzinaKonca+":"+minutaKonca, radiusAndCoordinates, chosenAction, telephone, smsText);
+            	    if(telephone!=null) {
+            	    	oldTelephone = telephone;
+            	    	telephoneEditText.setText(telephone);
+            	    }
+            	    if(smsText!=null) {
+            	    	oldSmsText = smsText;
+            	    	smsTextEditText.setText(smsText);
+            	    }
+            	    oldAction = chosenAction;
+            	    if(chosenAction.equalsIgnoreCase(Action.MUTEPHONE)) chooseActionSpinner.setSelection(0);
+            	    else if(chosenAction.equalsIgnoreCase(Action.SENDSMS)) chooseActionSpinner.setSelection(1);
+            	    oldRadius = radiusAndCoordinates[0];
+            	    radiusEditText.setText(""+radiusAndCoordinates[0]);
+            	    latitude = oldLatitude = radiusAndCoordinates[1];
+            	    longitude = oldLongitude = radiusAndCoordinates[2];
+            	    oldOpisZadania = opisZadania;
     	    		editText.setText(opisZadania);
     	    		oknoZadania.setNegativeButton("Usun", Clickacz);
     	    		oknoZadania.show();

@@ -33,6 +33,7 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
 	private int markerCount = 0;
 	private Circle circle;
 	private Marker marker;
+	private LatLng markerPosition;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +41,25 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
         setContentView(R.layout.activity_map);
         
         radius = getIntent().getDoubleExtra("radius", 0.0);
+        double latitude = getIntent().getDoubleExtra("latitude", 0.0);
+        double longitude = getIntent().getDoubleExtra("longitude", 0.0);
         db = new DatabaseHandler(this);
         setUpMapIfNeeded();
+        
+        if(latitude!=0.0 && longitude!=0.0) {
+        	markerPosition = new LatLng(latitude, longitude);
+        	marker = mMap.addMarker(new MarkerOptions()
+						.position(markerPosition)
+						.icon(BitmapDescriptorFactory
+								.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+				circle = mMap.addCircle(new CircleOptions().center(markerPosition)
+						.radius(radius)
+						.fillColor(Color.argb(120, 0, 0, 255)));
+				markerCount++;
+				data.putExtra("latitude", latitude);
+				data.putExtra("longitude", longitude);
+				setResult(RESULT_OK, data);
+        }
     }
 
 
@@ -91,7 +109,8 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
                         mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                       }
                       //mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 50));
-                      if(GPSService.startingLocation!=null) mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(GPSService.startingLocation, 18));
+                      if(markerPosition!=null) mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(markerPosition, 18));
+                      else if(GPSService.startingLocation!=null) mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(GPSService.startingLocation, 18));
                 }
             });
         }

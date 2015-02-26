@@ -54,9 +54,10 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/locationButton"
-        android:text="100"
+        android:background="@color/white"
         android:ems="10"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"
+        android:text="100" />
 
     <Button
         android:id="@+id/locationButton"
@@ -64,7 +65,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="Okresl pozycje" />
+        android:text="Okresl pozycje"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white" />
 
     <TextView
         android:id="@+id/telephoneNumberTextView"
@@ -92,7 +95,9 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/telephoneNumberTextView"
         android:layout_alignParentRight="true"
-        android:text="Wybierz akcję" />
+        android:text="Wybierz akcję"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white" />
 
     <Spinner
         android:id="@+id/chooseActionSpinner"
@@ -100,6 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/locationButton"
         android:layout_alignLeft="@+id/chooseActionTextView"
-        android:layout_below="@+id/chooseActionTextView" />
+        android:layout_below="@+id/chooseActionTextView"
+        android:background="@drawable/but1" />
 
 </RelativeLayout>
